@@ -8,6 +8,12 @@ Why?  Because learning Python shouldn't require fluency in English, and the help
 is the most language-intensive part of the early programming language learning experience.
 Plus, Python 3 fully supports Unicode, so why not?
 
+## Installation
+
+```bash
+  pip install helptranslator
+```
+
 ## Example
 
 Calling the **set_help_lang()** function overrides the built-in **help()** function,
