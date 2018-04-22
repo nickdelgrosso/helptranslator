@@ -46,7 +46,7 @@ Or Chinese:
 
 ```python
   import helptranslator
-  helptranslator.set_help_lang('russian')
+  helptranslator.set_help_lang('chinese (simplified)')
 
   help(sum)
   >> Hilfe zur eingebauten Funktionssumme in den eingebauten Modulen:
@@ -66,7 +66,7 @@ Or Russian:
 
 ```python
   import helptranslator
-  helptranslator.set_help_lang('chinese (simplified)')
+  helptranslator.set_help_lang('russian')
 
   help(sum)
   >> Справка по встроенной функции sum в встроенных модулях:
