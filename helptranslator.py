@@ -4,13 +4,14 @@ import googletrans
 
 _original_output = pydoc.help._output
 
-def set_help_lang(lang):
-    if lang in googletrans.LANGUAGES:
-        langcode = lang
-    elif lang in googletrans.LANGCODES:
-        langcode = googletrans.LANGCODES[lang]
+def set_help_lang(language):
+    """Overrides the help() function output to a given language, using Google Translate."""
+    if language in googletrans.LANGUAGES:
+        langcode = language
+    elif language in googletrans.LANGCODES:
+        langcode = googletrans.LANGCODES[language]
     else:
-        raise ValueError("'{}' not found in list of languages.  Available options are:\n{}".format(lang, googletrans.LANGUAGES))
+        raise ValueError("'{}' not found in list of languages.  Available options are:\n{}".format(language, googletrans.LANGUAGES))
 
     if langcode == 'en':
         pydoc.help._output = _original_output
