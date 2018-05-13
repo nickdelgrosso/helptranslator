@@ -7,6 +7,15 @@ import json
 
 _original_output = pydoc.help._output
 
+def join_no_longer_than_n(lines, n):
+    paras, para = [], ''
+    for line in lines:
+        if len(para) + len(line) > n:
+            paras.append(para)
+            para = ''
+        para += line
+    paras.append(para)
+    return paras
 
 @functools.lru_cache(maxsize=128)
 def translate_string(string, langcode):
@@ -30,9 +39,10 @@ def set_help_lang(language):
 
     class STDOutTrans(object):
         def write(self, string):
-            translated_string = translate_string(string, langcode)
-            sys.stdout.write(translated_string)
-            # _original_output.write(translated_string)
+            paragraphs = join_no_longer_than_n(string.split('\n'), n=5000)
+            translated_string = '\n'.join(translate_string(p, langcode) for p in paragraphs)
+            # sys.stdout.write(translated_string)
+            _original_output.write(translated_string)
 
     pydoc.help._output = STDOutTrans()
     return
