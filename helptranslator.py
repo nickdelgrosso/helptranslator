@@ -2,7 +2,7 @@ import sys
 import pydoc
 import functools
 import itertools
-import googletrans
+from googletrans import Translator, LANGUAGES, LANGCODES
 import json
 
 _original_output = pydoc.help._output
@@ -17,21 +17,22 @@ def join_no_longer_than_n(lines, n):
     paras.append(para)
     return paras
 
+
 @functools.lru_cache(maxsize=128)
 def translate_string(string, langcode):
-    translator = googletrans.Translator()
-    translated = translator.translate(string, dest=langcode)
-    return translated.text
+    paragraphs = join_no_longer_than_n(string.split('\n'), n=5000)
+    translated_string = '\n'.join(Translator().translate(p, dest=langcode).text for p in paragraphs)
+    return translated_string
 
 
 def set_help_lang(language):
     """Overrides the help() function output to a given language, using Google Translate."""
-    if language in googletrans.LANGUAGES:
+    if language in LANGUAGES:
         langcode = language
-    elif language in googletrans.LANGCODES:
-        langcode = googletrans.LANGCODES[language]
+    elif language in LANGCODES:
+        langcode = LANGCODES[language]
     else:
-        raise ValueError("'{}' not found in list of languages.  Available options are:\n{}".format(language, googletrans.LANGUAGES))
+        raise ValueError("'{}' not found in list of languages.  Available options are:\n{}".format(language, LANGUAGES))
 
     if langcode == 'en':
         pydoc.help._output = _original_output
@@ -39,10 +40,9 @@ def set_help_lang(language):
 
     class STDOutTrans(object):
         def write(self, string):
-            paragraphs = join_no_longer_than_n(string.split('\n'), n=5000)
-            translated_string = '\n'.join(translate_string(p, langcode) for p in paragraphs)
-            # sys.stdout.write(translated_string)
-            _original_output.write(translated_string)
+            translated_string = translate_string(string, langcode)
+            sys.stdout.write(translated_string)
+            # _original_output.write(translated_string)
 
     pydoc.help._output = STDOutTrans()
     return
@@ -61,7 +61,7 @@ def translate_langdict(langdict, lang):
     """calls Google translate on all values in a dict, returning a translated dict."""
     translated_dict = {'module': langdict['module']}
     for fun, string in langdict.items():
-        translator = googletrans.Translator()
+        translator = Translator()
         translated = translator.translate(string, dest=lang)
         translated_dict[fun] = translated.text
     return translated_dict
