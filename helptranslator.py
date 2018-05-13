@@ -1,10 +1,19 @@
 import sys
 import pydoc
+import functools
 import itertools
 import googletrans
 import json
 
 _original_output = pydoc.help._output
+
+
+@functools.lru_cache(maxsize=128)
+def translate_string(string, langcode):
+    translator = googletrans.Translator()
+    translated = translator.translate(string, dest=langcode)
+    return translated.text
+
 
 def set_help_lang(language):
     """Overrides the help() function output to a given language, using Google Translate."""
@@ -21,9 +30,9 @@ def set_help_lang(language):
 
     class STDOutTrans(object):
         def write(self, string):
-            translator = googletrans.Translator()
-            translated = translator.translate(string, dest=langcode)
-            sys.stdout.write(translated.text)
+            translated_string = translate_string(string, langcode)
+            sys.stdout.write(translated_string)
+            # _original_output.write(translated_string)
 
     pydoc.help._output = STDOutTrans()
     return
